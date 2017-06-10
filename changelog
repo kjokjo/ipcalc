@@ -99,3 +99,8 @@ rework getclass
                 - If running inside Emacs M-x shell, turn of colors by default
                 - Applied patch by Bartosz Fenski Adjust usage() text
                 - add table tag at the end of supernets adds </table> tag at the end of supernet output when in html mode 
+                Add manpage of Nick Clifford 
+                Applied patch of Victor Engmark:
+                  Description: fixes overzealous input checking
+                  Netmask /0 is perfectly fine, with this patch it's possible to use it.
+
