@@ -95,4 +95,4 @@ rework getclass
                 Accept ipv6 addresses and masks
                 Output very basic information about the ipv6 address
                 Move code to github 
-
+		Applied patch by Bartosz Fenski If running inside Emacs M-x shell, turn of colors by default
