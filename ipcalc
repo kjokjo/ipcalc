@@ -985,7 +985,7 @@ sub print_summary6
 	print "\n";
 	
 	printf "%-9s","Prefix:";
-	printf "%-40s",ntoip6($address & prefixlenton($netmask));
+	printf "%-40s",ntoip6($address & prefixlenton($netmask))."/".$netmask;
 	printf "%-130s",ntob6($address & prefixlenton($netmask));
 	print "\n";
 	
