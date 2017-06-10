@@ -1,0 +1,93 @@
+0.14    Release
+0.14.1  Allow netmasks given as dotted quads
+0.15    Colorize Classbits, Mark new bits in network
+0.16    25.9.2000 Accept <addr>/<cidr> as first argument
+        Print <pre> tag in the script
+0.17    Bugfix
+0.18    Replace \n with <br> in HTML to make konqueror work. Argh.
+0.19    HTML modified again to make Internet Exploder work. Argh ** 2
+        Added -v Option
+0.2     New Tabular Format. Idea by Kevin Ivory
+0.21    
+0.22    Don't show -1 if netmask is 32 (Sven Anderson)
+0.23    Removed broken prototyping. Thanks to Scott Davis sdavis(a)austin-texas.net
+0.31    4/1/2001 Print cisco wildcard (inverse netmask). 
+        Idea by Denis Alan Hainsworth denis(a)ans.net
+0.32    5/21/2001 - Accepts now inverse netmask as argument (Alan's idea again)
+        Fixed missing trailing zeros in sub/supernets
+        Warns now when given netmasks are illegal
+        Added option to suppress the binary output
+        Added help text
+0.33	  5/21/2001 Cosmetic
+0.34    6/19/2001 Use default netmask of class when no netmask is given
+0.35    12/2/2001 Fixed big-endian bug in subnets(). This was reported 
+        by Igor Zozulya and Steve Kent. Thank you for your help 
+        and access to your sparc machine!
+0.35a   ??? [Never released] Fixed broken HTML: missing </font> tags.
+         Thanks to Torgen Foertsch 
+0.35.1  Repairing HTML
+0.35.2  Again repair HTML. Thanks to Lars Mueller.
+
+
+0.36-pre1
++ getopts
++ split_network
++ deaggregate
++ rename dqtobin bintodq
++ netblocks
++ accept hex netmasks (contribution)
++ remove garbage
++ rework argument handling
++ work all the time on integers, not machine type representations (pack)
++ eliminated unnessessary globals
++ replaced is_valid...
++ rewrote  format_bin 
++ various changes
++ applied fix for colorchange in format_bin scott baker
+
+0.36-pre3
+removed print_netmask
+sticked formatbin and printline together to printline
+(this marks new bits in supernets (former version didn't)
+use label to decide what sfx to print
+0.36-pre4
+made subnets supernets           
+     split / deaggregate work with new parameters
+removed old functions
+how to handle /31 and /32?
+
+0.36-pre5
+removed debug output in deaggregate
+
+0.36-pre6
+started netblocks
+rework getclass
+
+0.36 
+/31
+
+2004
+0.37-pre5
++handle /31 /32
++new html
++wrap_html
++GPL Header 
+
+0.37 2004-05-14 debian asked for a bug fix in 0.35
+
+0.38 2004-10-08 ipcalc did not work on 64bit architectures. 
+                Thanks to Foxfair Hu <foxfair(a)FreeBSD.org> for finding this bug
+                
+0.39 2005-07-07 Added output of class only option (-c --class), that was accidentally
+                removed in 0.36
+		Changed console color of bits back from white to yellow. (Requested by Oliver Seufer)
+		Added ipcalc.cgi and images to the package  
+		Added license file to the package
+		Added license text in cgi-wrapper
+		Added contributors file to the package
+
+0.40 2005-07-07 Make -c really do what it did before. (Giving the "natural" mask). Thanks
+		to Bartosz Fenski. 
+		Include style sheet into ipcalc.cgi
+0.41 2006-07-27 CGI-Script: Replaced REQUEST_URI with SCRIPT_URL to prevent cross-site-scripting attacks
+		Thanks to Tim Brown
