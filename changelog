@@ -95,4 +95,7 @@ rework getclass
                 Accept ipv6 addresses and masks
                 Output very basic information about the ipv6 address
                 Move code to github 
-		Applied patch by Bartosz Fenski If running inside Emacs M-x shell, turn of colors by default
+		Applied patches by Bartosz Fenski
+                - If running inside Emacs M-x shell, turn of colors by default
+                - Applied patch by Bartosz Fenski Adjust usage() text
+                - add table tag at the end of supernets adds </table> tag at the end of supernet output when in html mode 

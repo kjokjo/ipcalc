@@ -238,6 +238,9 @@ EOF
    if ($mask1 > $mask2) {
       print "Supernet\n\n";
       supernet($network,$mask1,$mask2);
+      if ($opt_html) {
+         html("</table>\n");
+      }
    }
    if ($opt_html) {
       print << 'EOF';
@@ -1267,10 +1270,11 @@ sub usage {
     print << "EOF";
 Usage: ipcalc [options] <ADDRESS>[[/]<NETMASK>] [NETMASK]
 
-ipcalc takes an IP address and netmask and calculates the resulting broadcast, 
-network, Cisco wildcard mask, and host range. By giving a second netmask, you 
-can design sub- and supernetworks. It is also intended to be a teaching tool 
-and presents the results as easy-to-understand binary values. 
+ipcalc takes an IP address and netmask and calculates the resulting
+broadcast, network, Cisco wildcard mask, and host range. By giving a
+second netmask, you can design sub- and supernetworks. It is also
+intended to be a teaching tool and presents the results as
+easy-to-understand binary values.
 
  -n --nocolor  Don't display ANSI color codes.
  -c --color    Display ANSI color codes (default).
@@ -1282,7 +1286,7 @@ and presents the results as easy-to-understand binary values.
                Split into networks of size n1, n2, n3.
  -r --range    Deaggregate address range.
     --help     Longer help text.
- 
+
 Examples:
 
 ipcalc 192.168.0.1/24
@@ -1308,31 +1312,30 @@ sub help {
     
 IP Calculator $version
 
-Enter your netmask(s) in CIDR notation (/25) or dotted decimals (255.255.255.0).
-Inverse netmask are recognized. If you omit the netmask, ipcalc uses the default
-netmask for the class of your network.
+Enter your netmask(s) in CIDR notation (/25) or dotted decimals
+(255.255.255.0). Inverse netmask are recognized. If you mmit the
+netmask, ipcalc uses the default netmask for the class of your
+network.
 
-Look at the space between the bits of the addresses: The bits before it are 
-the network part of the address, the bits after it are the host part. You can
-see two simple facts: In a network address all host bits are zero, in a 
-broadcast address they are all set. 
+Look at the space between the bits of the addresses: The bits before
+it are the network part of the address, the bits after it are the host
+part. You can see two simple facts: In a network address all host bits
+are zero, in a broadcast address they are all set.
 
-The class of your network is determined by its first bits. 
+The class of your network is determined by its first bits.
 
-If your network is a private internet according to RFC 1918 this is remarked. 
-When displaying subnets the new bits in the network part of the netmask are 
-marked in a different color. 
+If your network is a private internet according to RFC 1918 this is
+remarked. When displaying subnets the new bits in the network part of
+the netmask are marked in a different color.
 
-The wildcard is the inverse netmask as used for access control lists in Cisco 
-routers. You can also enter netmasks in wildcard notation. 
+The wildcard is the inverse netmask as used for access control lists
+in Cisco routers. You can also enter netmasks in wildcard notation.
 
-Do you want to split your network into subnets? Enter the address and netmask 
-of your original network and play with the second netmask until the result 
-matches your needs. 
+Do you want to split your network into subnets? Enter the address and
+netmask of your original network and play with the second netmask
+until the result matches your needs.
 
-
-Questions? Comments? Drop me a mail... 
-krischan at jodies.de
+Questions? Comments? Drop me a mail: krischan at jodies.de
 http://jodies.de/ipcalc
 
 Thanks for your nice ideas and help to make this tool more useful: 
