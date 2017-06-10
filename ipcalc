@@ -20,8 +20,9 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 use strict;
+use bignum;
 
-my $version = '0.41';
+my $version = '0.5';
 
 my @class   = qw (0 8 16 24 4 5 5);
 
@@ -52,6 +53,7 @@ my @opt_split_sizes;
 my @arguments;
 my $error = "";
 my $thirtytwobits = 4294967295; # for masking bitwise not on 64 bit arch
+my $ipv6 = 0;
 
 main();
 exit;
@@ -134,7 +136,8 @@ EOF
    }
    if ($address == -1) {
       $error .= "INVALID ADDRESS: $ARGV[0]\n";
-      $address = argton("192.168.1.1");
+      $address = argton("192.168.1.1",0);
+      # default to sample ipv6 address if $ipv6 == 1
    }
 
    if ($opt_print_only_class) {
@@ -149,7 +152,7 @@ EOF
       }
       if ($address2 == -1) {
         $error .= "INVALID ADDRESS2: $ARGV[1]\n";
-        $address2 = argton("192.168.1.1");
+        $address2 = argton("192.168.1.1",0);
       }
    }
 
@@ -163,27 +166,34 @@ EOF
    }
 
    # get netmasks
-   if (defined $ARGV[1]) {
-      $mask1   = argton($ARGV[1],1);
+   if ($ipv6) {
+     if (defined $ARGV[1]) {
+	$mask1 = $ARGV[1];
+     } else {
+        $mask1 = 64;
+     }
    } else {
-      #get natural mask ***
-      $mask1 = argton(24);
+      if (defined $ARGV[1]) {
+         $mask1   = argton($ARGV[1],1);
+      } else {
+         #get natural mask ***
+         $mask1 = argton(24,1);
+      }
+      if ($mask1   == -1) {
+         $error .= "INVALID MASK1:   $ARGV[1]\n";
+         $mask1   = argton(24,1);
+      }
+   
+      if (defined $ARGV[2]) {
+         $mask2   = argton($ARGV[2],1);
+      } else {
+         $mask2 = $mask1;
+      }
+      if ($mask2   == -1) {
+         $error .= "INVALID MASK2:   $ARGV[2]\n";
+         $mask2   = argton(24,1);
+      }
    }
-   if ($mask1   == -1) {
-      $error .= "INVALID MASK1:   $ARGV[1]\n";
-      $mask1   = argton(24);
-   }
-
-   if (defined $ARGV[2]) {
-      $mask2   = argton($ARGV[2],1);
-   } else {
-      $mask2 = $mask1;
-   }
-   if ($mask2   == -1) {
-      $error .= "INVALID MASK2:   $ARGV[2]\n";
-      $mask2   = argton(24);
-   }
-
    if ($error) {
       if ($opt_color) {
          print set_color($error_color);
@@ -194,7 +204,10 @@ EOF
 #   print "Address: ".ntoa($address)."\n";
 #   print "mask1: ($mask1) ".ntoa($mask1)."\n";
 #   print "mask2: ($mask2) ".ntoa($mask2)."\n";
-   
+   if ($ipv6) {
+      ipcalc6($address,$address2,$mask1,$mask2);
+      exit;
+   }  
    html('<table border="0" cellspacing="0" cellpadding="0">');
    html("\n");
    printline ("Address",   $address ,$mask1,$mask1,1);
@@ -902,7 +915,7 @@ sub netblock
    #
    foreach (keys %netblocks) {
       my ($network,$mask) = split "/",$_;
-      my $start = argton($network);
+      my $start = argton($network,0);
       my $end   = $start + (1 << (32-$mask)) -1;
       # mynetwork starts within block
       if ($mynetwork_start >= $start && $mynetwork_start <= $end) {
@@ -926,7 +939,122 @@ sub netblock
    return "";
 }
 
+sub p2
+{
+  my $x = shift;
+  return 1 << $x
+}
+
+sub ntob6
+{
+	my $n = shift;
+	my $b;# = "";
+#my $nr = 0;
+#$b = "$n ";
+	for(my $i=127;$i>-1;$i--)
+	{
+#print "$i ";
+#print 1 << $i;
+#print "\n";
+#$nr++;
+		if (($n & (1 << $i)) == (1 << $i)) {
+			$b .= "1";
+		} else {
+			$b .= "0";
+		}
+		if ($i % 16 == 0 && $i != 0) {
+			$b .= ":";
+		}
+	
+	}
+	return $b; # . " " . $nr;
+}
+
+
+sub print_summary6
+{
+	my $address = shift;
+	my $netmask = shift;
+	printf "%-9s","Address:";
+	printf "%-40s",ntoip6($address);
+	printf "%-130s",ntob6($address);
+	print "\n";
+	printf "%-9s","Netmask:";
+	printf "%-40s",$netmask;
+	printf "%-130s",ntob6(prefixlenton($netmask));
+	print "\n";
+	
+	printf "%-9s","Prefix:";
+	printf "%-40s",ntoip6($address & prefixlenton($netmask));
+	printf "%-130s",ntob6($address & prefixlenton($netmask));
+	print "\n";
+	
+	print "\n";
+}
+
+
+sub ipcalc6
+{
+   #print "welcome to ipv6\n";
+   my $address = shift;
+   my $address2 = shift;
+   my $mask1 = shift;
+   my $mask2 = shift;
+   #print "$address\n";
+   #print ntoip6($address);
+   #print "\n";
+   print_summary6($address,$mask1);
+   exit;
+}
+
+
 # ------- converter ---------------------------------------------
+
+sub ntoip6
+{
+	my $n = shift;
+	my $slice;
+	my @slices;
+	my $result;
+	for (my $i=7;$i>-1;$i--) {
+		$slice = ($n >> ($i*16)) & 65535;
+		push @slices,sprintf "%x",$slice;
+	}
+	$result = join ":",@slices;
+	# compress
+	my $length = 0;
+	my $max_length = 0;
+	my $start = 0;
+	for (my $i=0;$i<8;$i++) {
+		$length = 0;
+		while (($i+$length < 8) && $slices[$i+$length] eq "0") {
+			$length++;
+		}
+		if ($length > $max_length) {
+			$start = $i;
+			$max_length = $length;
+		} 
+	}
+
+	if ($max_length > 0) {
+		$result = "";
+		if ($start == 0) {
+			$result = "::";
+		}
+		for (my $i = 0; $i<8;$i++) {
+			if (! ($i>=$start && $i<$start+$max_length)) {
+				$result .= $slices[$i];
+				if ($i < 7) {
+					$result .= ":";
+				}
+				if ($i+1 == $start) {
+					$result .= ":";
+				}
+			}
+		}
+	} 
+	return $result;
+}
 
 sub bitcountmaskton 
 {
@@ -936,6 +1064,77 @@ sub bitcountmaskton
       $n |= 1 << (31-$i);
    }
    return $n;
+}
+
+sub ip6ton
+{
+	my $arg = shift;
+	my $n = 0;
+	my @slice;
+	my $compressed = 0;
+	$arg = lc($arg);
+	my @tmp;
+	my $test = $arg;
+	$test =~ s/[0-9a-f:]//g;
+	if ($test ne '') {
+print "Illegal chars\n";
+		return -1;
+	}
+	$test = $arg;
+	if ($arg =~ /^::/) {
+		$arg = "0".$arg;
+	}
+	if ($arg =~/::$/) {
+		$arg = $arg."0";
+	}
+	@tmp = split ":",$arg;
+#foreach my $x (@tmp)
+#{
+#	print "- '$x'\n";
+#}
+	foreach my $slice (@tmp)
+	{
+#print "- '$slice'\n";
+		if ($slice eq '') {
+			if ($compressed) {
+print "multiple ::\n";
+				return -1;
+			}
+			for (my $i=0;$i<8-$#tmp;$i++) {
+				push @slice,0;
+				$compressed = 1;
+			}
+		} else {
+			push @slice,$slice;
+		}
+	}
+#foreach my $s (@slice) {
+#	print "- $s\n";
+#}
+#print $#slice;
+#print "\n";
+	if ($#slice != 7) {
+#print "nr of slices != 8\n";
+		return -1;
+	}
+	for (my $i=0;$i<8;$i++) {
+		$n += hex($slice[$i]) << 16*(7-$i);
+#print "n += $slice[$i] << ".16*(7-$i) ."  $n\n";
+#print ntob($n);
+#print "\n";
+#print "\n";
+	}
+	return $n;
+}
+
+sub prefixlenton
+{
+	my $prefixlen = shift;
+	my $n = 0;
+	for (my $i=128;$i>127-$prefixlen;$i--) {
+		$n += p2($i);
+	}
+	return $n;
 }
 
 sub argton
@@ -949,6 +1148,15 @@ sub argton
    
    my $i = 24;
    my $n = 0;
+   
+   # ipv6
+   #print "arg = '$arg'\n";
+   #print "netmask_flag = '$netmask_flag'\n";
+   if ($netmask_flag == 0 && $arg =~ /^[0-9a-fA-F:]+$/) {
+     # check syntax
+     $ipv6 = 1;
+     return ip6ton($arg);
+   }
    
    # dotted decimals
    if    ($arg =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/) {
@@ -968,14 +1176,23 @@ sub argton
    
    # bit-count-mask (24 or /24)
    $arg =~ s/^\/(\d+)$/$1/;
-   if ($arg =~ /^\d{1,2}$/) {
-      if ($arg < 1 || $arg > 32) {
-         return -1;
+   if ($ipv6) {
+      if ($arg =~ /^\d{1,3}$/) {
+         if ($arg < 1 || $arg > 128) {
+            return -1;
+         }
+         return prefixlenton($arg);
       }
-      for ($i=0;$i<$arg;$i++) {
-         $n |= 1 << (31-$i);
+   } else {
+      if ($arg =~ /^\d{1,2}$/) {
+         if ($arg < 1 || $arg > 32) {
+            return -1;
+         }
+         for ($i=0;$i<$arg;$i++) {
+            $n |= 1 << (31-$i);
+         }
+         return $n;
       }
-      return $n;
    }
    
    # hex
@@ -1082,7 +1299,7 @@ sub help {
 IP Calculator $version
 
 Enter your netmask(s) in CIDR notation (/25) or dotted decimals (255.255.255.0).
-Inverse netmask are recognized. If you mmit the netmask, ipcalc uses the default
+Inverse netmask are recognized. If you omit the netmask, ipcalc uses the default
 netmask for the class of your network.
 
 Look at the space between the bits of the addresses: The bits before it are 
@@ -1124,6 +1341,7 @@ Scott Davis
 Steve Kent
 Sven Anderson
 Torgen Foertsch
+Edward
 
 EOF
 usage();

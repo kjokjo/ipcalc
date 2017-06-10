@@ -91,3 +91,8 @@ rework getclass
 		Include style sheet into ipcalc.cgi
 0.41 2006-07-27 CGI-Script: Replaced REQUEST_URI with SCRIPT_URL to prevent cross-site-scripting attacks
 		Thanks to Tim Brown
+0.5  2017-06-09 Fixed typo in help text. Thank you Edward!
+                Accept ipv6 addresses and masks
+                Output very basic information about the ipv6 address
+                Move code to github 
+
