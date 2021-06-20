@@ -101,6 +101,8 @@ rework getclass
                 - add table tag at the end of supernets adds </table> tag at the end of supernet output when in html mode 
                 Add manpage of Nick Clifford 
                 Applied patch of Victor Engmark:
-                  Description: fixes overzealous input checking
-                  Netmask /0 is perfectly fine, with this patch it's possible to use it.
-
+                Description: fixes overzealous input checking
+                Netmask /0 is perfectly fine, with this patch it's possible to use it.
+0.51 2021-06-20 bugifx: split_network results were wrong since introduction of bignum. log function replaced
+		with loop.
+                Thanks to Christian Ebnöter for finding thix bug

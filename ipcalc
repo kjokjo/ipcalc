@@ -2,7 +2,7 @@
 
 
 #  IPv4 Calculator
-#  Copyright (C) Krischan Jodies 2000 - 2004
+#  Copyright (C) Krischan Jodies 2000 - 2021
 #  krischan()jodies.de, http://jodies.de/ipcalc
 #   
 #  This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 use strict;
 use bignum;
 
-my $version = '0.5';
+my $version = '0.51';
 
 my @class   = qw (0 8 16 24 4 5 5);
 
@@ -639,7 +639,6 @@ sub split_network
    my $needed_size;
    foreach (@sizes) {
       $needed_size = round2powerof2($_+2);
-#      printf "%3d -> %3d -> %3d\n",$_,$_+2,$needed_size;
       push @network , $needed_size .":".$i++;
       $needed_addresses += $needed_size;
    }
@@ -647,7 +646,7 @@ sub split_network
    foreach (@network) {
       my ($size,$nr) = split ":",$_;
       $net[$nr]=  $network;
-      $mask[$nr]= (32-log($size)/log(2));
+      $mask[$nr]= size2bitcountmask($size);
       $network += $size;
    }
    $i = -1;
@@ -660,7 +659,7 @@ sub split_network
       printnet($net[$i],bitcountmaskton($mask[$i]),$mask2);
    }
 
-   my $used_mask = 32-log(round2powerof2($needed_addresses))/log(2);
+   my $used_mask = size2bitcountmask($needed_addresses);
    if ($used_mask < ntobitcountmask($mask1)) {
       print "Network is too small\n";
    }
@@ -677,6 +676,16 @@ sub round2powerof2 {
      $i++;
   }
   return 1 << $i;
+}
+
+sub size2bitcountmask
+{
+   my $size = shift;
+   my $i = 0;
+   while ($size > ( 1 << $i)) {
+      $i++;
+   }
+   return 32-$i;
 }
 
 # Deaggregate address range
