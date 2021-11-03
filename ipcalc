@@ -1329,7 +1329,7 @@ sub help {
 IP Calculator $version
 
 Enter your netmask(s) in CIDR notation (/25) or dotted decimals
-(255.255.255.0). Inverse netmask are recognized. If you mmit the
+(255.255.255.0). Inverse netmask are recognized. If you omit the
 netmask, ipcalc uses the default netmask for the class of your
 network.
 
