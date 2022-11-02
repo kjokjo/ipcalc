@@ -204,7 +204,7 @@ EOF
       }
       print "$error\n";
       print set_color($norml_color);
-      exit;
+      exit 1;
    }
 
 #   print "Address: ".ntoa($address)."\n";
