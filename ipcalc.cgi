@@ -65,6 +65,12 @@ if (! defined $host) {
 	$host = '';
 }
 
+@mask0 = split(/\//, $host);
+if (@mask0[1] ne "") {
+  $host = @mask0[0];
+  $mask1 = @mask0[1];
+}
+
 if (! defined $mask1) {
 	$mask1 = '';
 	$help = 1;

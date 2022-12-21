@@ -22,7 +22,7 @@
 use strict;
 use bignum;
 
-my $version = '0.51';
+my $version = '0.52';
 
 my @class   = qw (0 8 16 24 4 5 5);
 
