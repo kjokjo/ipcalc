@@ -1322,7 +1322,7 @@ ipcalc 192.168.0.1 0.0.63.255
 
 ipcalc <ADDRESS1> - <ADDRESS2>  deaggregate address range
 
-ipcalc <ADDRESS>/<NETMASK> --s a b c
+ipcalc <ADDRESS>/<NETMASK> -s a b c
                                 split network to subnets
 				where a b c fits in.
 
