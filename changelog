@@ -105,4 +105,4 @@ rework getclass
                 Netmask /0 is perfectly fine, with this patch it's possible to use it.
 0.51 2021-06-20 bugifx: split_network results were wrong since introduction of bignum. log function replaced
 		with loop.
-                Thanks to Christian Ebnöter for finding thix bug
+                Thanks to Christian Ebnöther for finding thix bug
