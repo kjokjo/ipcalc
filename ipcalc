@@ -742,7 +742,7 @@ sub getopts
 
    # Under Emacs, do not use colors by default. The TERM is for older
    # Emacs versions.
-   if ( !defined($ENV{'TERM'}) or $ENV{'TERM'} =~ /dumb/i  or  $ENV{'INSIDE_EMACS'} ) {
+   if ( !defined($ENV{'WT_SESSION'}) and !defined($ENV{'TERM'}) and !defined($ENV{'TERM_PROGRAM'}) or defined($ENV{'TERM'}) and $ENV{'TERM'} =~ /dumb/i  or  $ENV{'INSIDE_EMACS'} ) {
        $opt_color = 0;
    }
 
