@@ -701,9 +701,10 @@ sub deaggregate
   {
        $step = 0;
        while (($base | (1 << $step))  != $base) {
-          if (($base | (((~0) & $thirtytwobits) >> (31-$step))) > $end) {
-	     last;
-	  }
+          my $mask = (((~0) & $thirtytwobits) >> (31-$step))->as_int();
+          if (($base | $mask) > $end) {
+             last;
+          }
           $step++;
        }
        print ntoa($base)."/" .(32-$step);
