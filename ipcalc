@@ -48,6 +48,7 @@ my $opt_print_only_class = 0;
 my $opt_split       = 0;
 my $opt_deaggregate   = 0;
 my $opt_version     = 0;
+my $opt_aws         = 0;
 my $opt_help        = 0;
 my @opt_split_sizes;
 my @arguments;
@@ -353,7 +354,7 @@ sub printnet {
 
     my $broadcast = $network | ((~$mask1) & $thirtytwobits);
     
-    $hmin  = $network + 1;
+    $hmin  = $network + 1 + $opt_aws * 3;
     $hmax  = $broadcast - 1;
     $hostn =  $hmax - $hmin + 1;
     $mask  = ntobitcountmask($mask1);
@@ -728,6 +729,7 @@ sub getopts
    # -s --split
    # -b --nobinary
    # -d --deaggregate  
+   # -a --aws
 {  
    my @arguments;
    my $arg;
@@ -835,6 +837,9 @@ sub getopts
 	}
 	elsif ($opt eq 'r' || $opt eq 'range') {
            $opt_deaggregate =  1;
+        }
+        elsif ($opt eq 'a' || $opt eq 'aws') {
+            $opt_aws = 1;
         }
 	elsif ($opt eq 's' || $opt eq 'split') {
 	   $opt_split = 1;
@@ -1310,6 +1315,7 @@ easy-to-understand binary values.
  -s --split n1 n2 n3
                Split into networks of size n1, n2, n3.
  -r --range    Deaggregate address range.
+ -a --aws      Consider AWS address reservations
     --help     Longer help text.
 
 Examples:
